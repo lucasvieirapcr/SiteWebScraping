@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Automação de Web Scraping ASSEFAZ</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="icon" href="https://www.assefaz.org.br/assefaz/2022/assets/img/favicon.ico">
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="{{ url_for('index') }}" class="nav-logo">
+                <img src="{{ url_for('static', filename='logo-at.png') }}" alt="GEAP Saúde Logo">
+            </a>
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="{{ url_for('index') }}" class="nav-link active">Coleta de Planos da ASSEFAZ</a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ url_for('about') }}" class="nav-link">Sobre</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+
+    <div class="container">
+        <a href="{{ url_for('index') }}" class="nav-logo">
+                <img src="{{ url_for('static', filename='Logo Geap-01.png') }}" alt="GEAP Saúde Logo">
+        </a>
+        <h1>Automação de Web Scraping de Prestadores da ASSEFAZ</h1>
+        <p>Preencha os campos abaixo e clique em 'Iniciar Coleta' para extrair os dados da rede credenciada.</p>
+        
+        <form id="scraping-form">
+            <div class="form-group">
+                <label for="plan_code">Escolha o Plano</label>
+                <select id="plan_code" name="plan_code" required>
+                    {% if plan_choices %}
+                        {% for plan in plan_choices %}
+                        <option value="{{ plan.value }}">{{ plan.name }}</option>
+                        {% endfor %}
+                    {% else %}
+                        <option value="" disabled selected>Não foi possível carregar os planos</noscript>
+                    {% endif %}
+                </select>
+                <small>Selecione um plano específico ou 'TODOS OS PLANOS' para uma busca completa.</small>
+            </div>
+            
+            <div class="form-group">
+                <label for="output_filename">Nome do Arquivo de Saída</label>
+                <input type="text" id="output_filename" name="output_filename" value="Resultado_ASSEFAZ_{{ now.strftime('%Y-%m-%d') }}.xlsx" required>
+                <small>O arquivo será salvo com a extensão .xlsx.</small>
+            </div>
+            
+            <button type="submit" id="start-button">Iniciar Coleta</button>
+        </form>
+        
+        <div id="log-container">
+            <h2>Log de Progresso</h2>
+            <pre id="log-output">Aguardando início da coleta...</pre>
+        </div>
+        
+        <div id="download-container" class="hidden">
+            <h2>Download do Arquivo Gerado</h2>
+            <a id="download-link" href="#" download>Clique aqui para baixar o arquivo</a>
+        </div>
+
+        <!-- NOVO CAMPO ADICIONADO -->
+        <div id="latest-download-section">
+            <h2>Último Arquivo Salvo</h2>
+            {% if latest_file %}
+                <p>O último arquivo gerado está disponível para download:</p>
+                <!-- Este link aponta para a nova rota /download/latest que você criou -->
+                <a href="{{ url_for('download_latest_file') }}" class="download-button">Download do Último arquivo baixado</a>
+            {% else %}
+                <p>Nenhum arquivo foi gerado na pasta 'output' ainda.</p>
+            {% endif %}
+        </div>
+        <!-- FIM DO NOVO CAMPO -->
+
+    </div>
+
+    <script>
+        document.getElementById('scraping-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const form = event.target;
+            const formData = new FormData(form);
+            const logOutput = document.getElementById('log-output');
+            const downloadContainer = document.getElementById('download-container');
+            const downloadLink = document.getElementById('download-link');
+            const startButton = document.getElementById('start-button');
+
+            logOutput.textContent = 'Iniciando a coleta... Isso pode levar vários minutos, por favor, aguarde.';
+            downloadContainer.classList.add('hidden');
+            startButton.disabled = true;
+            startButton.textContent = 'Coletando...';
+
+            fetch('/start-scraping', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                logOutput.textContent = data.log;
+                if (data.filename) {
+                    downloadLink.href = `/download/${data.filename}`;
+                    downloadLink.textContent = `Clique aqui para baixar: ${data.filename}`;
+                    downloadContainer.classList.remove('hidden');
+                    // Recarrega a página para atualizar a seção 'Último Arquivo Salvo'
+                    setTimeout(() => { window.location.reload(); }, 1500);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                logOutput.textContent = 'Ocorreu um erro durante a coleta. Verifique o console do servidor para mais detalhes.';
+            })
+            .finally(() => {
+                startButton.disabled = false;
+                startButton.textContent = 'Iniciar Coleta';
+            });
+        });
+    </script>
+</body>
+</html>

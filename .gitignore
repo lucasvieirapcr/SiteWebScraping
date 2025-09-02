@@ -1,0 +1,18 @@
+# Ambiente virtual do Python
+venv/
+.venv/
+env/
+*.env
+
+# Arquivos de cache do Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Pasta com os arquivos gerados (Excel)
+output/
+
+# Arquivos de configuração de IDEs (opcional, mas recomendado)
+.vscode/
+.idea/

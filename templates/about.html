@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sobre a Ferramenta - Scraper ASSEFAZ</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="icon" href="https://www.assefaz.org.br/assefaz/2022/assets/img/favicon.ico">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="{{ url_for('index') }}" class="nav-logo">
+                <img src="{{ url_for('static', filename='logo-at.png') }}" alt="GEAP Saúde Logo">
+            </a>
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="{{ url_for('index') }}" class="nav-link">Coleta de Planos da ASSEFAZ</a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ url_for('about') }}" class="nav-link active">Sobre</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Novo container para centralizar o conteúdo da página Sobre -->
+        <div class="about-content">
+            <h1>Aplicação Web de Extração de Dados</h1>
+            <h4>Criado para a <strong>GAP</strong></h4>
+            
+            <hr class="dashed-separator">
+            
+            <h2>Extração de dados da ASSEFAZ</h2>
+            
+            <p class="description">
+                Essa automação serve para extrair os dados da rede credenciada de uma forma rápida e confiável.
+            </p>
+            
+            <!-- Div para agrupar a lista de campos extraídos -->
+            <div class="data-fields-list">
+                Plano<br>
+                Nome do Hospital<br>
+                CNPJ do hospital<br>
+                Endereço Completo<br>
+                Bairro<br>
+                Estado<br>
+                CEP<br>
+                Telefone
+            </div>
+            
+            <p class="final-note">
+                Após a extração dos dados, você consegue baixar uma planilha com essas informações.
+            </p>
+
+            <hr class="dashed-separator">
+        </div>
+    </div>
+
+</body>
+</html>
